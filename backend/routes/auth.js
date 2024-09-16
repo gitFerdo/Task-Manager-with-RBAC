@@ -7,10 +7,15 @@ const User = require("../model/User");
 
 const router = express.Router();
 
-// Register new User
+// Registration
 router.post("/register", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
+
+    // Validate role
+    if (!["admin", "manager", "employee"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,12 +26,14 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       role,
     });
+
+    // Save user to the database
     await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "An error occurred during registering" });
+    console.error("Error during registration:", err);
+    res.status(500).json({ message: "An error occurred during registration" });
   }
 });
 
