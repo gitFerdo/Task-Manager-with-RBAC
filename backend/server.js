@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotnet = require("dotenv");
+const cors = require("cors");
 
 const authRoutes = require("./routes/auth");
 const taskRoutes = require("./routes/tasks");
@@ -11,6 +12,7 @@ dotnet.config();
 // Define schema
 const app = express();
 app.use(express.json());
+app.use(cors({ origin: "http://localhost:3001" }));
 
 app.use("/auth", authRoutes);
 app.use("/auth", taskRoutes);
