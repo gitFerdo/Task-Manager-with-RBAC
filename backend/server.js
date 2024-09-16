@@ -4,6 +4,7 @@ const dotnet = require("dotenv");
 
 const authRoutes = require("./routes/auth");
 const taskRoutes = require("./routes/tasks");
+const teamRoutes = require("./routes/teams");
 
 dotnet.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/auth", taskRoutes);
+app.use("/auth", teamRoutes);
 
 // Database connection
 mongoose.set("strictQuery", false);

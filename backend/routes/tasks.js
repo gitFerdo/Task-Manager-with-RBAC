@@ -1,51 +1,51 @@
 const express = require("express");
-
 const auth = require("../middleware/auth");
 const Task = require("../model/Task");
+const User = require("../model/User");
 
 const router = express.Router();
 
-// Create Tasks
-router.post("/task", auth(["admin", "manager"]), async (req, res) => {
+// Create a task
+router.post("/tasks", auth(["admin", "manager"]), async (req, res) => {
   try {
     const { title, description, assignedTo } = req.body;
+    const user = req.user;
 
-    // Create a new task
+    if (user.role === "manager") {
+      const manager = await User.findById(user._id).populate("team");
+      if (!manager.team.members.includes(assignedTo)) {
+        return res
+          .status(403)
+          .json({ message: "Not authorized to assign tasks to this user" });
+      }
+    }
+
     const task = new Task({
       title,
       description,
       assignedTo,
-      createdBy: req.user.userId,
+      createdBy: user._id,
     });
 
-    // Save the task to the database
     await task.save();
-
     res.status(201).json(task);
   } catch (err) {
-    console.error("Error during creating new Task:", err);
-
-    return res
-      .status(500)
-      .json({ message: "An error during creating new Task" });
+    res.status(500).json({ message: "Error creating task" });
   }
 });
 
-// Update Tasks - Admin && Manager
-router.put("/:id", auth(["admin", "manager"]), async (req, res) => {
+// Update a task
+router.put("/tasks/:id", auth(["admin", "manager"]), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // only admin and manager are allowed to update tasks
     if (
-      task.createdBy.toString() !== req.user.userId.toString() &&
+      task.createdBy.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"
     ) {
-      return res
-        .status(403)
-        .json({ message: "You do not have permission to update this task" });
+      return res.status(403).json({ message: "Access denied" });
     }
 
     Object.assign(task, req.body);
@@ -53,24 +53,21 @@ router.put("/:id", auth(["admin", "manager"]), async (req, res) => {
 
     res.json(task);
   } catch (err) {
-    console.error("Error during updating Task:", err);
-
-    return res.status(500).json({ message: "An error during updating Task" });
+    res.status(500).json({ message: "Error updating task" });
   }
 });
 
-// Update Task Status - Employee
-router.patch("/:id/status", auth(["employee"]), async (req, res) => {
+// Update task status (for employees)
+router.patch("/tasks/:id/status", auth("employee"), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // only employee can update tasks assigned to them
-    if (task.assignedTo.toString() !== req.user.userId.toString()) {
+    if (task.assignedTo.toString() !== req.user._id.toString()) {
       return res
         .status(403)
-        .json({ message: "You can only update tasks assigned to you" });
+        .json({ message: "Not authorized to update this task" });
     }
 
     task.status = req.body.status;
@@ -78,79 +75,57 @@ router.patch("/:id/status", auth(["employee"]), async (req, res) => {
 
     res.json(task);
   } catch (err) {
-    console.error("Error during updating Task status:", err);
-
-    return res
-      .status(500)
-      .json({ message: "An error during updating Task status" });
+    res.status(500).json({ message: "Error updating task status" });
   }
 });
 
-// Get all tasks
+// Get tasks
 router.get(
   "/tasks",
   auth(["admin", "manager", "employee"]),
   async (req, res) => {
     try {
-      let tasks;
       const user = req.user;
+      let tasks;
 
-      // Admins can see all tasks
       if (user.role === "admin") {
         tasks = await Task.find()
-          .populate("assignedTo", "name email")
-          .populate("createdBy", "name email");
-      }
-      // Managers can see tasks created by them or assigned to their team
-      else if (user.role === "manager") {
-        tasks = await Task.find({ createdBy: user.userId }).populate(
-          "assignedTo",
-          "name email"
-        );
-      }
-      // Employees can only see tasks assigned to them
-      else if (user.role === "employee") {
-        tasks = await Task.find({ assignedTo: user.userId });
+          .populate("assignedTo", "username")
+          .populate("createdBy", "username");
+      } else if (user.role === "manager") {
+        const manager = await User.findById(user._id).populate("team");
+        tasks = await Task.find({ createdBy: user._id }).or([
+          { assignedTo: { $in: manager.team.members } },
+        ]);
+      } else if (user.role === "employee") {
+        tasks = await Task.find({ assignedTo: user._id });
       }
 
       res.status(200).json(tasks);
     } catch (err) {
-      console.error("Error fetching tasks:", err);
-      res
-        .status(500)
-        .json({ message: "An error occurred while fetching tasks" });
+      res.status(500).json({ message: "Error fetching tasks" });
     }
   }
 );
 
-// Delete Task
-router.delete("/:id", auth(["admin", "manager"]), async (req, res) => {
+// Delete a task
+router.delete("/tasks/:id", auth(["admin", "manager"]), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // Only admin or manager who created the task or belongs to the same manager can delete
     if (
-      (task.createdBy.toString() !== req.user.userId.toString() &&
-        req.user.role !== "admin") ||
-      (req.user.role === "manager" &&
-        task.createdBy.toString() !== req.user.userId.toString())
+      task.createdBy.toString() !== req.user._id.toString() &&
+      req.user.role !== "admin"
     ) {
-      return res
-        .status(403)
-        .json({ message: "You do not have permission to delete this task" });
+      return res.status(403).json({ message: "Access denied" });
     }
 
-    // Delete the task
-    await task.deleteOne({ _id: req.params.id });
-
+    await task.deleteOne();
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (err) {
-    console.error("Error during deleting Task:", err);
-    res
-      .status(500)
-      .json({ message: "An error occurred while deleting the task" });
+    res.status(500).json({ message: "Error deleting task" });
   }
 });
 
