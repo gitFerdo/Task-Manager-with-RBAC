@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const authMiddleware = (role = []) => {
+const authMiddleware = (roles = []) => {
   return (req, res, next) => {
     const token = req.headers.authorization?.replace("Bearer ", "");
 
@@ -10,7 +10,7 @@ const authMiddleware = (role = []) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
 
-      if (role.length && !role.includes(req.user.role)) {
+      if (roles.length && !roles.includes(req.user.role)) {
         return res
           .status(403)
           .json({ message: "You do not have access to this resource." });

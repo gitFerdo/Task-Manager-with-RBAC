@@ -17,6 +17,12 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Invalid role" });
     }
 
+    // Check if the user already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -60,14 +66,14 @@ router.post("/login", async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "30minutes",
+        expiresIn: "30m",
       }
     );
 
     res.json({ token });
   } catch (err) {
     console.error("Error during login:", err);
-    return res.status(500).json({ message: "An error occurred during login." });
+    return res.status(500).json({ message: "An error occurred during login" });
   }
 });
 
