@@ -4,12 +4,17 @@ const instance = axios.create({
   baseURL: "http://localhost:3000",
 });
 
-instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers["x-auth-token"] = token;
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers["x-auth-token"] = token;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default instance;

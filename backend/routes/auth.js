@@ -70,7 +70,7 @@ router.post("/login", async (req, res) => {
       }
     );
 
-    res.json({ token });
+    res.json({ token, role: user.role });
   } catch (err) {
     console.error("Error during login:", err);
     return res.status(500).json({ message: "An error occurred during login" });
