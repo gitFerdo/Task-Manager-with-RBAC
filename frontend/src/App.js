@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import AdminDashboard from "./components/admin/AdminDashboard";
+import ManageUsers from "./components/admin/ManageUsers";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
 
         {/* Routes for admin */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/manage-users" element={<ManageUsers />} />
       </Routes>
     </BrowserRouter>
   );

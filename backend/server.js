@@ -6,17 +6,25 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const taskRoutes = require("./routes/tasks");
 const teamRoutes = require("./routes/teams");
+const userRoutes = require("./routes/user");
 
 dotnet.config();
 
 // Define schema
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3001" }));
+// app.use(cors({ origin: "http://localhost:3001" }));
+const corsOptions = {
+  origin: "http://localhost:3001",
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 
 app.use("/auth", authRoutes);
-app.use("/auth", taskRoutes);
-app.use("/auth", teamRoutes);
+app.use("/task", taskRoutes);
+app.use("/team", teamRoutes);
+app.use("/user", userRoutes);
 
 // Database connection
 mongoose.set("strictQuery", false);
