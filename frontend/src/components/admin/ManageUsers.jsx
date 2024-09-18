@@ -35,6 +35,9 @@ function ManageUsers() {
     team: "",
   });
 
+  // Assuming you store the token in local storage after login
+  const token = localStorage.getItem("token"); // Adjust if using context or another method
+
   useEffect(() => {
     fetchUsers();
     fetchTeams();
@@ -42,7 +45,11 @@ function ManageUsers() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("/user/all");
+      const response = await axios.get("/user/all", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUsers(response.data);
       setError(""); // Reset error on success
     } catch (err) {
@@ -56,7 +63,11 @@ function ManageUsers() {
 
   const fetchTeams = async () => {
     try {
-      const response = await axios.get("/team/all");
+      const response = await axios.get("/team/all", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setTeams(response.data);
       setError(""); // Reset error on success
     } catch (err) {
@@ -86,7 +97,11 @@ function ManageUsers() {
 
   const handleCreateUser = async () => {
     try {
-      await axios.post("/auth/register", currentUser);
+      await axios.post("/auth/register", currentUser, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       toast.success("User created successfully");
       fetchUsers();
       handleClose();
@@ -104,7 +119,11 @@ function ManageUsers() {
   const handleDeleteUser = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await axios.delete(`/user/delete/${id}`);
+        await axios.delete(`/user/delete/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         toast.success("User deleted successfully");
         fetchUsers();
       } catch (err) {

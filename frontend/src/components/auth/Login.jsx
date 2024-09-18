@@ -16,16 +16,18 @@ function Login() {
     setError(""); // Clear any previous error message
 
     try {
-      const { data } = await axios.post("/auth/login", { username, password });
+      const response = await axios.post("/auth/login", { username, password });
 
-      localStorage.setItem("token", data.token);
+      console.log("Login response:", response.data);
+
+      localStorage.setItem("token", response.data.token);
 
       // Navigate based on role received from server
-      if (data.role === "admin") {
+      if (response.data.role === "admin") {
         navigate("/admin-dashboard");
-      } else if (data.role === "manager") {
+      } else if (response.data.role === "manager") {
         navigate("/manager-dashboard");
-      } else if (data.role === "employee") {
+      } else if (response.data.role === "employee") {
         navigate("/employee-dashboard");
       } else {
         // If role doesn't match any known roles, show error message
