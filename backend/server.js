@@ -13,13 +13,7 @@ dotnet.config();
 // Define schema
 const app = express();
 app.use(express.json());
-// app.use(cors({ origin: "http://localhost:3001" }));
-const corsOptions = {
-  origin: "http://localhost:3001",
-  optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+app.use(cors({ origin: "http://localhost:3000" }));
 
 app.use("/auth", authRoutes);
 app.use("/task", taskRoutes);
