@@ -4,10 +4,10 @@ This is a role-based task management application built using **MERN STACK** . Th
 
 ## Installation
 
-### Clone the repository:
+**Clone the repository:**
 
 ```bash
-git clone https://github.com/gitFerdo/Task-Manager-with-RBAC
+git clone https://github.com/gitFerdo/Task-Manager-with-RBAC.git
 ```
 
 ### Backend Setup
@@ -22,7 +22,7 @@ git clone https://github.com/gitFerdo/Task-Manager-with-RBAC
    ```
 3. Create a `.env` file in the backend root directory with the following environment variables:
    ```bash
-   MONGO_URI=<your_mongo_db_uri>
+   MONGO_URL=<your_mongo_db_uri>
    JWT_SECRET=<your_jwt_secret>
    PORT=3000
    ```
@@ -52,7 +52,7 @@ git clone https://github.com/gitFerdo/Task-Manager-with-RBAC
 
 ### Backend
 
-The backend is built with Node.js, Express, and **MongoDB**. It uses **JWT** for authentication and **_Role-Based Access Control (RBAC)_** to manage user permissions. The backend provides APIs for tasks, users, and teams.
+The backend is built with **Node.js**, **Express**, and **MongoDB**. It uses **JWT** for authentication and **_Role-Based Access Control (RBAC)_** to manage user permissions. The backend provides APIs for tasks, users, and teams.
 
 - **Roles**: Admin, Manager, and Employee.
 - **Database**: MongoDB with Mongoose ORM.
@@ -84,13 +84,6 @@ Below is a summary of the API endpoints:
     "password": "admin123"
   }
   ```
-- **Response**:
-  ```json
-  {
-    "token": "your-jwt-token",
-    "role": "admin"
-  }
-  ```
 - **Authentication**: None required
 
 #### Register
@@ -103,18 +96,6 @@ Below is a summary of the API endpoints:
     "username": "user",
     "password": "user123",
     "role": "employee"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "message": "User registered successfully",
-    "user": {
-      "_id": "612345...",
-      "username": "user",
-      "password": "user123",
-      "role": "employee"
-    }
   }
   ```
 - **Authentication**: None required
@@ -133,16 +114,6 @@ Below is a summary of the API endpoints:
     "title": "New Task",
     "description": "This is a test task",
     "assignedTo": "<employee_id>"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "_id": "6123...",
-    "title": "New Task",
-    "description": "This is a test task",
-    "assignedTo": "<employee_id>",
-    "createdBy": "<admin_id>"
   }
   ```
 - **Authentication**: Requires `Bearer <JWT Token>`
@@ -178,16 +149,6 @@ Below is a summary of the API endpoints:
     "description": "New task description."
   }
   ```
-- **Response**:
-  ```json
-  {
-    "_id": "6123...",
-    "title": "Update the task title",
-    "description": "New task description.",
-    "assignedTo": "<employee_id>",
-    "status": "pending"
-  }
-  ```
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin, Manager
 
@@ -198,16 +159,6 @@ Below is a summary of the API endpoints:
 - **Request Body**:
   ```json
   {
-    "status": "in-progress"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "_id": "6123...",
-    "title": "Update the task title",
-    "description": "New task description.",
-    "assignedTo": "<employee_id>",
     "status": "in-progress"
   }
   ```
@@ -242,15 +193,6 @@ Below is a summary of the API endpoints:
     "members": ["<employee_id_1>", "<employee_id_2>"]
   }
   ```
-- **Response**:
-  ```json
-  {
-    "_id": "61234...",
-    "name": "Development Team",
-    "members": ["<employee_id_1>", "<employee_id_2>"],
-    "createdBy": "<admin_id>"
-  }
-  ```
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -265,15 +207,6 @@ Below is a summary of the API endpoints:
     "removeMembers": ["66e8..."]
   }
   ```
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -297,15 +230,6 @@ Below is a summary of the API endpoints:
 
 - **Method**: GET
 - **Endpoint**: `http://localhost:3000/team/:id/members`
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -313,15 +237,6 @@ Below is a summary of the API endpoints:
 
 - **Method**: DELETE
 - **Endpoint**: `http://localhost:3000/team/:id`
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -333,15 +248,6 @@ Below is a summary of the API endpoints:
 
 - **Method**: GET
 - **Endpoint**: `http://localhost:3000/user/all`
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -349,15 +255,6 @@ Below is a summary of the API endpoints:
 
 - **Method**: GET
 - **Endpoint**: `http://localhost:3000/user/:id`
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -373,15 +270,6 @@ Below is a summary of the API endpoints:
     "role": "employee"
   }
   ```
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -397,15 +285,6 @@ Below is a summary of the API endpoints:
     "role": "manager"
   }
   ```
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
@@ -413,15 +292,6 @@ Below is a summary of the API endpoints:
 
 - **Method**: DELETE
 - **Endpoint**: `http://localhost:3000/user/delete/:id`
-  <!-- - **Response**:
-    ```json
-    {
-      "_id": "61234...",
-      "name": "Development Team",
-      "members": ["<employee_id_1>", "<employee_id_2>"],
-      "createdBy": "<admin_id>"
-    }
-    ``` -->
 - **Authentication**: Requires `Bearer <JWT Token>`
 - **Roles**: Admin
 
