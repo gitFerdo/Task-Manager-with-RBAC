@@ -13,11 +13,13 @@ dotnet.config();
 // Define schema
 const app = express();
 app.use(express.json());
-app.use(cors({
-  origin: "http://localhost:3000",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 
 app.use("/auth", authRoutes);
 app.use("/task", taskRoutes);
@@ -38,6 +40,10 @@ const connectDB = async () => {
 
 connectDB();
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Server listening on port " + (process.env.PORT || 3000));
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(process.env.PORT || 3000, () => {
+    console.log("Server listening on port " + (process.env.PORT || 3000));
+  });
+}
+
+module.exports = app;

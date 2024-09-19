@@ -6,7 +6,7 @@ const User = require("../model/User");
 const router = express.Router();
 
 // Create a task
-router.post("/tasks", auth(["admin", "manager"]), async (req, res) => {
+router.post("/", auth(["admin", "manager"]), async (req, res) => {
   try {
     const { title, description, assignedTo } = req.body;
     const user = req.user;
@@ -35,7 +35,7 @@ router.post("/tasks", auth(["admin", "manager"]), async (req, res) => {
 });
 
 // Update a task
-router.put("/tasks/:id", auth(["admin", "manager"]), async (req, res) => {
+router.put("/:id", auth(["admin", "manager"]), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -58,7 +58,7 @@ router.put("/tasks/:id", auth(["admin", "manager"]), async (req, res) => {
 });
 
 // Update task status (for employees)
-router.patch("/tasks/:id/status", auth("employee"), async (req, res) => {
+router.patch("/:id/status", auth("employee"), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -80,36 +80,32 @@ router.patch("/tasks/:id/status", auth("employee"), async (req, res) => {
 });
 
 // Get tasks
-router.get(
-  "/tasks",
-  auth(["admin", "manager", "employee"]),
-  async (req, res) => {
-    try {
-      const user = req.user;
-      let tasks;
+router.get("/", auth(["admin", "manager", "employee"]), async (req, res) => {
+  try {
+    const user = req.user;
+    let tasks;
 
-      if (user.role === "admin") {
-        tasks = await Task.find()
-          .populate("assignedTo", "username")
-          .populate("createdBy", "username");
-      } else if (user.role === "manager") {
-        const manager = await User.findById(user._id).populate("team");
-        tasks = await Task.find({ createdBy: user._id }).or([
-          { assignedTo: { $in: manager.team.members } },
-        ]);
-      } else if (user.role === "employee") {
-        tasks = await Task.find({ assignedTo: user._id });
-      }
-
-      res.status(200).json(tasks);
-    } catch (err) {
-      res.status(500).json({ message: "Error fetching tasks" });
+    if (user.role === "admin") {
+      tasks = await Task.find()
+        .populate("assignedTo", "username")
+        .populate("createdBy", "username");
+    } else if (user.role === "manager") {
+      const manager = await User.findById(user._id).populate("team");
+      tasks = await Task.find({ createdBy: user._id }).or([
+        { assignedTo: { $in: manager.team.members } },
+      ]);
+    } else if (user.role === "employee") {
+      tasks = await Task.find({ assignedTo: user._id });
     }
+
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching tasks" });
   }
-);
+});
 
 // Delete a task
-router.delete("/tasks/:id", auth(["admin", "manager"]), async (req, res) => {
+router.delete("/:id", auth(["admin", "manager"]), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
