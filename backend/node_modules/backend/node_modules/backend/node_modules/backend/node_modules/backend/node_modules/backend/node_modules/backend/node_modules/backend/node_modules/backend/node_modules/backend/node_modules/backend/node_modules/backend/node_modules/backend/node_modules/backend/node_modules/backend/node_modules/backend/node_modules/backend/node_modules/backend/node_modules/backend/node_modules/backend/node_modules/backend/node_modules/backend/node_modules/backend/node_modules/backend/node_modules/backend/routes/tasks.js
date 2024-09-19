@@ -80,7 +80,7 @@ router.patch("/:id/status", auth("employee"), async (req, res) => {
 });
 
 // Get tasks
-router.get("/", auth(["admin", "manager", "employee"]), async (req, res) => {
+router.get("/all", auth(["admin", "manager", "employee"]), async (req, res) => {
   try {
     const user = req.user;
     let tasks;
